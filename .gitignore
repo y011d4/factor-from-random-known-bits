@@ -1,1 +1,6 @@
 /target
+factor.egg-info
+build
+dist
+__pycache__
+*.so
