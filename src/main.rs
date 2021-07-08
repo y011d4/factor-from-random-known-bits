@@ -14,7 +14,7 @@ fn main() {
     let p_bits = str_to_vec(p_bits_str, bit_len);
     let q_bits = str_to_vec(q_bits_str, bit_len);
     assert_eq!(p_bits.len(), q_bits.len());
-    match factor_core(&n, p_bits, q_bits, bit_len) {
+    match factor_core(&n, p_bits, q_bits, bit_len, false) {
         Some((p, q)) => println!("{}, {}", p, q),
         None => println!("Not found"),
     };
@@ -33,7 +33,7 @@ mod tests {
         let expected: Option<(Integer, Integer)> =
             Some(("17".parse().unwrap(), "19".parse().unwrap()));
         assert_eq!(
-            factor_core(&n, p_bits.clone(), q_bits.clone(), bit_len),
+            factor_core(&n, p_bits.clone(), q_bits.clone(), bit_len, false),
             expected
         );
     }
@@ -47,6 +47,6 @@ mod tests {
         let bit_len = 512;
         let p_bits = str_to_vec("1010101111000NNN11000NNN11100NNN11010NNN0NNN0NNN0NNN100110000NNN0NNN0NNN0NNN11000NNN0NNN0NNN110110010NNN11001100100111010NNN100011000NNN0NNN0NNN0NNN11111000111111100NNN1101110010000NNN0NNN0NNN0NNN10110NNN0NNN0NNN0NNN0NNN0NNN1100101111000NNN0NNN1001111011110NNN0NNN10000NNN0NNN0NNN11010NNN1010101110110NNN0NNN0NNN0NNN0NNN10010NNN1011101011100NNN110111010NNN0NNN0NNN0NNN101010110NNN0NNN10000NNN1000101011000NNN0NNN0NNN0NNN101010000NNN11010NNN111010000NNN0NNN11110NNN0NNN10010NNN111010010NNN0NNN0NNN10100NNN0NNN0NNN".as_bytes(), bit_len);
         let q_bits = str_to_vec("110111010NNN111011110NNN0NNN1000100110001110100111100NNN0NNN10110NNN11000NNN0NNN10110NNN11100NNN10000NNN0NNN0NNN11111100110010100NNN10000NNN11100NNN0NNN110010110NNN101110010NNN10010NNN11110NNN11110NNN0NNN1101111011000NNN101010110NNN10100NNN0NNN10100NNN1010101011010NNN0NNN0NNN100110110NNN0NNN10000NNN0NNN0NNN1000101110010NNN1111110010110NNN0NNN0NNN0NNN101110100NNN0NNN1100101111000NNN10100NNN0NNN0NNN0NNN0NNN0NNN0NNN10010NNN0NNN0NNN10100NNN10010NNN0NNN0NNN0NNN101011110NNN0NNN111110000NNN0NNN11110NNN0NNN10100NNN".as_bytes(), bit_len);
-        b.iter(|| factor_core(&n, p_bits.clone(), q_bits.clone(), bit_len));
+        b.iter(|| factor_core(&n, p_bits.clone(), q_bits.clone(), bit_len, false));
     }
 }

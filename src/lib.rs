@@ -1,4 +1,4 @@
-use ctrlc;
+// use ctrlc;
 use once_cell::sync::Lazy;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
@@ -33,6 +33,7 @@ pub fn factor_core(
     p_bits: Vec<i8>,
     q_bits: Vec<i8>,
     bit_len: usize,
+    verbose: bool,
 ) -> Option<(Integer, Integer)> {
     let mut ans: Option<(Integer, Integer)> = None;
     let mut queue: VecDeque<((Vec<i8>, Integer), (Vec<i8>, Integer), i32)> = VecDeque::new();
@@ -55,11 +56,13 @@ pub fn factor_core(
             idx += 1;
         }
         fixed_idx = idx - 1;
-        print!(
-            "\r\x1b[93mSearched index: {:<8?} Queue size: {:<8?}",
-            fixed_idx,
-            queue.len()
-        );
+        if verbose {
+            print!(
+                "\rSearched index: {:<8?} Queue size: {:<8?}",
+                fixed_idx,
+                queue.len()
+            );
+        }
         let tmp_p: Integer = bits_to_num(&p_bits, fixed_idx + 1, &saved_p, saved_idx);
         let tmp_q: Integer = bits_to_num(&q_bits, fixed_idx + 1, &saved_q, saved_idx);
         let two_pow = TWO.clone().pow((fixed_idx + 1) as u32);
@@ -199,8 +202,9 @@ pub fn factor_core(
             panic!("そうはならんやろ");
         }
     }
-    // println!("{:?}", ans);
-    println!();
+    if verbose {
+        println!();
+    }
     ans
 }
 
@@ -228,7 +232,7 @@ pub fn str_to_vec(bits_str: &[u8], bit_len: usize) -> Vec<i8> {
 ///
 /// Args:
 ///     n_str (str): `n` to be factored. `str` of decimal number.
-///     p_bits (list[int]): `list[int]` of `p`'s bits like `[-1, 1, 0, -1, 0, 1, -1]`.
+///     p_bits (list[int]): `list[int]` of `p`'s bits like `[-1, 1, 0, -1, 0, 1, -1]` (big endian).
 ///     q_bits (list[int]): the same as `p_bits`
 /// Returns:
 ///     (str, str) or None: (p, q) string in decimal or None if not found
@@ -243,11 +247,16 @@ fn from_vector(
     n_str: String,
     p_bits: Vec<i8>,
     q_bits: Vec<i8>,
+    verbose: Option<bool>,
 ) -> PyResult<Option<(String, String)>> {
-    ctrlc::set_handler(|| std::process::exit(2)).unwrap();
+    // ctrlc::set_handler(|| std::process::exit(2)).unwrap();
     let n: Integer = n_str.parse().unwrap();
     let bit_len = p_bits.len().max(q_bits.len());
-    match factor_core(&n, p_bits, q_bits, bit_len) {
+    let mut p_bits = p_bits.clone();
+    let mut q_bits = q_bits.clone();
+    p_bits.reverse();
+    q_bits.reverse();
+    match factor_core(&n, p_bits, q_bits, bit_len, verbose.unwrap_or(false)) {
         Some((p, q)) => Ok(Some((p.to_string_radix(10), q.to_string_radix(10)))),
         None => Ok(None),
     }
@@ -260,7 +269,7 @@ fn from_vector(
 ///
 /// Args:
 ///     n_str (str): `n` to be factored. `str` of decimal number.
-///     p_bits_str (str): string of `p`'s bits like "?10?01??1".
+///     p_bits_str (str): string of `p`'s bits like "?10?01??1" (big endian).
 ///     q_bits_str (str): the same as `p_bits_str`
 /// Returns:
 ///     (str, str) or None: (p, q) string in decimal
@@ -277,13 +286,14 @@ fn from_str(
     n_str: String,
     p_bits_str: String,
     q_bits_str: String,
+    verbose: Option<bool>,
 ) -> PyResult<Option<(String, String)>> {
-    ctrlc::set_handler(|| std::process::exit(2)).unwrap();
+    // ctrlc::set_handler(|| std::process::exit(2)).unwrap();
     let n: Integer = n_str.parse().unwrap();
     let bit_len = p_bits_str.len().max(q_bits_str.len());
     let p_bits = str_to_vec(p_bits_str.as_bytes(), bit_len);
     let q_bits = str_to_vec(q_bits_str.as_bytes(), bit_len);
-    match factor_core(&n, p_bits, q_bits, bit_len) {
+    match factor_core(&n, p_bits, q_bits, bit_len, verbose.unwrap_or(false)) {
         Some((p, q)) => Ok(Some((p.to_string_radix(10), q.to_string_radix(10)))),
         None => Ok(None),
     }
