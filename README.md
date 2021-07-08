@@ -35,7 +35,7 @@ python setup.py install
 
 There are some examples in `examples` directory.
 - "This is RSA" in SECCON CTF 2020
-- "regulus-calendula" in HSCTF 2021
+- "regulus-calendula" in HSCTF 8
 
 ## License
 
