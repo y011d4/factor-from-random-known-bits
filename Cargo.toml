@@ -3,6 +3,7 @@ name = "factor"
 version = "0.1.0"
 authors = ["y011d4 <yoiida333@gmail.com>"]
 edition = "2018"
+license = "MIT or Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

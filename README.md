@@ -1,4 +1,5 @@
 # Factor from random known bits
+
 This is a Python's library written in Rust to quickly factor `n = pq` when around >50% bits of `p` and `q` are known which are distributed at random.
 (Used mainly for CTF challenges, especially about RSA)
 
@@ -23,14 +24,32 @@ $ cargo run --release 3233 1_0__1 1___01
 53, 61
 ```
 
-# Install
+## Install
 
 ```bash
 pip install -r requirements.txt
 python setup.py install
 ```
 
-# Examples
+## Examples in CTF
+
 There are some examples in `examples` directory.
 - "This is RSA" in SECCON CTF 2020
 - "regulus-calendula" in HSCTF 2021
+
+## License
+
+Licensed under either of
+
+ * Apache License, Version 2.0
+   ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license
+   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
