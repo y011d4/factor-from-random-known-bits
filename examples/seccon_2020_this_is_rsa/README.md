@@ -17,5 +17,6 @@ puts "N = #{n}"
 puts "c = #{c}"
 ```
 
+# Writeup
 `OpenSSL::BN.rand(512).to_s.unpack1('H*').hex` returns `0x3_3_3_...`.
-So we know that `p` and `q` are `[..., 0, 0, 1, 1, ?, ?, ?, ?, 0, 0, 1, 1, ?, ?, ?, ?, ..., 0, 0, 1, 1, ?, ?, ?, ?]`
+So we know that `p` and `q` are `"...0011____0011____...0011____"` in binary.
