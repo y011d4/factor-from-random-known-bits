@@ -1,6 +1,6 @@
-# Factor when random bits are known
-This is a Python's library written in Rust to factor `n = pq` when around >50% random bits of `p` and `q` are known.
-(mainly for CTF challenges)
+# Factor from random known bits
+This is a Python's library written in Rust to quickly factor `n = pq` when around >50% bits of `p` and `q` are known which are distributed at random.
+(Used mainly for CTF challenges, especially about RSA)
 
 ```python
 >>> import factor
@@ -15,6 +15,12 @@ This is a Python's library written in Rust to factor `n = pq` when around >50% r
 >>> assert ans is not None
 >>> p, q = map(int, ans)
 >>> assert p * q == int(n_str)
+```
+
+In addition, `cargo run` works.
+```bash
+$ cargo run --release 3233 1_0__1 1___01
+53, 61
 ```
 
 # Install
