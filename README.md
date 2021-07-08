@@ -27,8 +27,12 @@ $ cargo run --release 3233 1_0__1 1___01
 ## Install
 
 ```bash
-pip install -r requirements.txt
-python setup.py install
+# If you have not yet installed Rust, run command below
+$ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Install as a Python package
+$ pip install -r requirements.txt
+$ python setup.py install
 ```
 
 ## Examples in CTF
