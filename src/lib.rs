@@ -221,8 +221,25 @@ pub fn str_to_vec(bits_str: &[u8], bit_len: usize) -> Vec<i8> {
     bits
 }
 
+/// from_vector(n_str, p_bits, q_bits)
+/// --
+///
+/// factor `n` from `p` (`list` like `[-1, 1, 0, -1, 0, 1, -1]`) and `q` whose bits are known around more than 50%.
+///
+/// Args:
+///     n_str (str): `n` to be factored. `str` of decimal number.
+///     p_bits (list[int]): `list[int]` of `p`'s bits like `[-1, 1, 0, -1, 0, 1, -1]`.
+///     q_bits (list[int]): the same as `p_bits`
+/// Returns:
+///     (str, str) or None: (p, q) string in decimal or None if not found
+/// Examples:
+///     >>> import factor
+///     >>> factor.from_vector("35", [1, 1, -1], [-1, 0, 1])
+///         ('7', '5')
+///     >>> factor.from_vector("35", [0, 1, -1], [-1, 0, 1]) is None
+///         True
 #[pyfunction]
-fn factor_from_vector(
+fn from_vector(
     n_str: String,
     p_bits: Vec<i8>,
     q_bits: Vec<i8>,
@@ -236,8 +253,27 @@ fn factor_from_vector(
     }
 }
 
+/// from_str(n_str, p_bits_str, q_bits_str)
+/// --
+///
+/// factor `n` from `p` (str like "_10_01__1") and `q` whose bits are known around more than 50%.
+///
+/// Args:
+///     n_str (str): `n` to be factored. `str` of decimal number.
+///     p_bits_str (str): string of `p`'s bits like "?10?01??1".
+///     q_bits_str (str): the same as `p_bits_str`
+/// Returns:
+///     (str, str) or None: (p, q) string in decimal
+/// Examples:
+///     >>> import factor
+///     >>> factor.from_str("35", "11_", "_01")
+///         ('7', '5')
+///     >>> factor.from_str("35", "11?", "?01")
+///         ('7', '5')
+///     >>> factor.from_str("35", "01_", "_01") is None
+///         True
 #[pyfunction]
-fn factor_from_str(
+fn from_str(
     n_str: String,
     p_bits_str: String,
     q_bits_str: String,
@@ -253,16 +289,10 @@ fn factor_from_str(
     }
 }
 
-#[pyfunction]
-fn hoge(a: usize, b: usize) -> PyResult<String> {
-    Ok((a + b).to_string())
-}
-
 #[pymodule]
 fn factor(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(factor_from_vector, m)?)?;
-    m.add_function(wrap_pyfunction!(factor_from_str, m)?)?;
-    m.add_function(wrap_pyfunction!(hoge, m)?)?;
+    m.add_function(wrap_pyfunction!(from_vector, m)?)?;
+    m.add_function(wrap_pyfunction!(from_str, m)?)?;
 
     Ok(())
 }
