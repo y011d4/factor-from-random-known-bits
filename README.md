@@ -1,11 +1,11 @@
 # Factor from random known bits
 
-This is a Python's library written in Rust to quickly factor `n = pq` when around >50% bits of `p` and `q` are known which are distributed at random.
-(Used mainly for CTF challenges, especially about RSA)
+Python's library written in Rust to quickly factor `n = pq` when around >50% bits of `p` and `q` are known which are distributed at random.
+Used mainly for CTF challenges, especially about RSA.
 
 ```python
 >>> import factor
->>> factor.from_str("35", "11?", "?01")
+>>> factor.from_str("35", "11_", "_01")
     ('7', '5')
 >>> factor.from_vector("35", [1, 1, -1], [-1, 0, 1])
     ('7', '5')
@@ -33,6 +33,16 @@ $ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # Install as a Python package
 $ pip install -r requirements.txt
 $ python setup.py install
+```
+
+You can also use a docker environment.
+
+```bash
+$ docker run -it --rm y011d4/factor-from-random-known-bits:0.1.0
+Python 3.9.6 (default, Jun 29 2021, 19:27:32)
+[GCC 8.3.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
 ```
 
 ## Examples in CTF
