@@ -7,13 +7,14 @@ license = "MIT or Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[[bin]]
-name = "factor"
-path = "src/main.rs"
-
 [lib]
 name = "factor"
-crate-type = ["cdylib"]
+path = "src/lib.rs"
+crate-type = ["lib", "cdylib"]
+
+[[example]]
+name = "factor_cui"
+path = "examples/factor_cui.rs"
 
 [dependencies]
 num-bigint = "0.4.0"

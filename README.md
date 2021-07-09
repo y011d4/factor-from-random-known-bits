@@ -18,9 +18,9 @@ Used mainly for CTF challenges, especially about RSA.
 >>> assert p * q == n
 ```
 
-In addition, `cargo run` works.
+In addition, of course, this can be used in Rust program. See `examples/factor_cui.rs`.
 ```bash
-$ cargo run --release 3233 1_0__1 1___01
+$ cargo run --release --example factor_cui 3233 1_0__1 1___01
 53, 61
 ```
 
