@@ -28,7 +28,82 @@ fn check(p: &Integer, q: &Integer, n: &Integer, m: u32) -> bool {
     return tmp_n == n_two_pow;
 }
 
-pub fn factor_core(
+pub fn factor_dfs(
+    n: &Integer,
+    p_bits: Vec<i8>,
+    q_bits: Vec<i8>,
+    bit_len: usize,
+    verbose: bool,
+) -> Option<(Integer, Integer)> {
+    let mut p: Integer = "0".parse().unwrap();
+    for i in 0..p_bits.len() {
+        if p_bits[i] == 1 {
+            p += Integer::from(1) << (i as u32);
+        }
+    }
+    let mut q: Integer = "0".parse().unwrap();
+    for i in 0..q_bits.len() {
+        if q_bits[i] == 1 {
+            q += Integer::from(1) << (i as u32);
+        }
+    }
+    fn dfs(
+        n: &Integer,
+        p: &mut Integer,
+        q: &mut Integer,
+        p_bits: &Vec<i8>,
+        q_bits: &Vec<i8>,
+        bit: usize,
+        max_bit: usize,
+    ) -> bool {
+        let mut bit = bit;
+        while bit < max_bit {
+            if p_bits[bit] == -1 || q_bits[bit] == -1 {
+                break;
+            }
+            bit += 1;
+        }
+        if bit == max_bit {
+            let mut tmp_n = p.clone();
+            tmp_n *= q.clone();
+            return &tmp_n == n;
+        }
+        for i in 0..2 {
+            for j in 0..2 {
+                let mut p_ = Integer::new();
+                if p_bits[bit] == -1 && i == 1 {
+                    p_.assign(Integer::from(1) << bit as u32);
+                } else {
+                    p_.assign(0);
+                }
+                let mut q_ = Integer::new();
+                if q_bits[bit] == -1 && j == 1 {
+                    q_.assign(Integer::from(1) << bit as u32);
+                } else {
+                    q_.assign(0);
+                }
+                *p += &p_;
+                *q += &q_;
+                let mut tmp_n = p.clone();
+                tmp_n *= q.clone();
+                tmp_n -= n;
+                tmp_n %= Integer::from(1) << (bit + 1) as u32;
+                if tmp_n == 0 && dfs(n, p, q, p_bits, q_bits, bit + 1, max_bit) {
+                    return true;
+                }
+                *p -= p_;
+                *q -= q_;
+            }
+        }
+        false
+    }
+    match dfs(n, &mut p, &mut q, &p_bits, &q_bits, 0, bit_len) {
+        true => Some((p, q)),
+        false => None,
+    }
+}
+
+pub fn factor_bfs(
     n: &Integer,
     p_bits: Vec<i8>,
     q_bits: Vec<i8>,
@@ -208,6 +283,20 @@ pub fn factor_core(
     ans
 }
 
+pub fn factor_core(
+    n: &Integer,
+    p_bits: Vec<i8>,
+    q_bits: Vec<i8>,
+    bit_len: usize,
+    verbose: bool,
+    search: String,
+) -> Option<(Integer, Integer)> {
+    match search.as_str() {
+        "dfs" => factor_dfs(n, p_bits, q_bits, bit_len, verbose),
+        _ => factor_bfs(n, p_bits, q_bits, bit_len, verbose),
+    }
+}
+
 pub fn str_to_vec(bits_str: &[u8], bit_len: usize) -> Vec<i8> {
     // assert!(bits_str.len() <= bit_len);
     let mut bits: Vec<i8> = vec![];
@@ -256,8 +345,15 @@ fn from_vector(
     let mut q_bits = q_bits.clone();
     p_bits.reverse();
     q_bits.reverse();
-    match factor_core(&n, p_bits, q_bits, bit_len, verbose.unwrap_or(false)) {
         Some((p, q)) => Ok(Some((p.to_string_radix(10), q.to_string_radix(10)))),
+    match factor_core(
+        &n,
+        p_bits,
+        q_bits,
+        bit_len,
+        verbose.unwrap_or(false),
+        search.unwrap_or("bfs".to_string()),
+    ) {
         None => Ok(None),
     }
 }
@@ -293,8 +389,15 @@ fn from_str(
     let bit_len = p_bits_str.len().max(q_bits_str.len());
     let p_bits = str_to_vec(p_bits_str.as_bytes(), bit_len);
     let q_bits = str_to_vec(q_bits_str.as_bytes(), bit_len);
-    match factor_core(&n, p_bits, q_bits, bit_len, verbose.unwrap_or(false)) {
         Some((p, q)) => Ok(Some((p.to_string_radix(10), q.to_string_radix(10)))),
+    match factor_core(
+        &n,
+        p_bits,
+        q_bits,
+        bit_len,
+        verbose.unwrap_or(false),
+        search.unwrap_or("bfs".to_string()),
+    ) {
         None => Ok(None),
     }
 }
