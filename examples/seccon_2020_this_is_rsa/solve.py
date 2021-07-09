@@ -21,9 +21,14 @@ while i < bit_len:
     q_bits[bit_len - 1 - i] = tmp
     i += 1
 
-ans = factor.from_vector(str(N), p_bits, q_bits)
-assert ans is not None
-p, q = map(int, ans)
+now = time.perf_counter()
+p_q = factor.from_vector(N, p_bits, q_bits, search="dfs")
+print(time.perf_counter() - now)
+now = time.perf_counter()
+p_q = factor.from_vector(N, p_bits, q_bits, search="bfs")
+print(time.perf_counter() - now)
+assert p_q is not None
+p, q = p_q
 
 phi = (p - 1) * (q - 1)
 d = pow(e, -1, phi)
