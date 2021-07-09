@@ -59,10 +59,10 @@ q_bits_str = "".join(
 )
 
 now = time.perf_counter()
-ans = factor.from_str(str(n), p_bits_str, q_bits_str, verbose=False)
+p_q = factor.from_str(n, p_bits_str, q_bits_str, verbose=False)
 print(time.perf_counter() - now)
-assert ans is not None
-p, q = map(int, ans)
+assert p_q is not None
+p, q = p_q
 phi = (p - 1) * (q - 1)
 d = pow(e, -1, phi)
 

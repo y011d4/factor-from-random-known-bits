@@ -1,8 +1,9 @@
 // use ctrlc;
+use num_bigint::BigInt;
 use once_cell::sync::Lazy;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
-use rug::{ops::Pow, Integer};
+use rug::{ops::Pow, Assign, Integer};
 use std::collections::VecDeque;
 
 static TWO: Lazy<Integer> = Lazy::new(|| "2".parse().unwrap());
@@ -33,7 +34,7 @@ pub fn factor_dfs(
     p_bits: Vec<i8>,
     q_bits: Vec<i8>,
     bit_len: usize,
-    verbose: bool,
+    _verbose: bool,
 ) -> Option<(Integer, Integer)> {
     let mut p: Integer = "0".parse().unwrap();
     for i in 0..p_bits.len() {
@@ -314,38 +315,38 @@ pub fn str_to_vec(bits_str: &[u8], bit_len: usize) -> Vec<i8> {
     bits
 }
 
-/// from_vector(n_str, p_bits, q_bits)
+/// from_vector(n, p_bits, q_bits, verbose=False, search="bfs")
 /// --
 ///
 /// factor `n` from `p` (`list` like `[-1, 1, 0, -1, 0, 1, -1]`) and `q` whose bits are known around more than 50%.
 ///
 /// Args:
-///     n_str (str): `n` to be factored. `str` of decimal number.
+///     n (int): `n` to be factored. `str` of decimal number.
 ///     p_bits (list[int]): `list[int]` of `p`'s bits like `[-1, 1, 0, -1, 0, 1, -1]` (big endian).
 ///     q_bits (list[int]): the same as `p_bits`
 /// Returns:
-///     (str, str) or None: (p, q) string in decimal or None if not found
+///     (int, int) or None: (p, q) such that n == p * q.
 /// Examples:
 ///     >>> import factor
-///     >>> factor.from_vector("35", [1, 1, -1], [-1, 0, 1])
-///         ('7', '5')
-///     >>> factor.from_vector("35", [0, 1, -1], [-1, 0, 1]) is None
+///     >>> factor.from_vector(35, [1, 1, -1], [-1, 0, 1])
+///         (7, 5)
+///     >>> factor.from_vector(35, [0, 1, -1], [-1, 0, 1]) is None
 ///         True
 #[pyfunction]
 fn from_vector(
-    n_str: String,
+    n: BigInt,
     p_bits: Vec<i8>,
     q_bits: Vec<i8>,
     verbose: Option<bool>,
-) -> PyResult<Option<(String, String)>> {
-    // ctrlc::set_handler(|| std::process::exit(2)).unwrap();
-    let n: Integer = n_str.parse().unwrap();
+    search: Option<String>,
+) -> PyResult<Option<(BigInt, BigInt)>> {
+    // ctrlc::set_handler(|| std::process::exit(2));
+    let n: Integer = n.to_str_radix(10).parse().unwrap();
     let bit_len = p_bits.len().max(q_bits.len());
     let mut p_bits = p_bits.clone();
     let mut q_bits = q_bits.clone();
     p_bits.reverse();
     q_bits.reverse();
-        Some((p, q)) => Ok(Some((p.to_string_radix(10), q.to_string_radix(10)))),
     match factor_core(
         &n,
         p_bits,
@@ -354,42 +355,46 @@ fn from_vector(
         verbose.unwrap_or(false),
         search.unwrap_or("bfs".to_string()),
     ) {
+        Some((p, q)) => Ok(Some((
+            p.to_string_radix(10).parse().unwrap(),
+            q.to_string_radix(10).parse().unwrap(),
+        ))),
         None => Ok(None),
     }
 }
 
-/// from_str(n_str, p_bits_str, q_bits_str)
+/// from_str(n, p_bits_str, q_bits_str, verbose=False, search="bfs")
 /// --
 ///
 /// factor `n` from `p` (str like "_10_01__1") and `q` whose bits are known around more than 50%.
 ///
 /// Args:
-///     n_str (str): `n` to be factored. `str` of decimal number.
+///     n (int): `n` to be factored.
 ///     p_bits_str (str): string of `p`'s bits like "?10?01??1" (big endian).
 ///     q_bits_str (str): the same as `p_bits_str`
 /// Returns:
-///     (str, str) or None: (p, q) string in decimal
+///     (int, int) or None: (p, q) such that n == p * q.
 /// Examples:
 ///     >>> import factor
-///     >>> factor.from_str("35", "11_", "_01")
-///         ('7', '5')
-///     >>> factor.from_str("35", "11?", "?01")
-///         ('7', '5')
-///     >>> factor.from_str("35", "01_", "_01") is None
+///     >>> factor.from_str(35, "11_", "_01")
+///         (7, 5)
+///     >>> factor.from_str(35, "11?", "?01")
+///         (7, 5)
+///     >>> factor.from_str(35, "01_", "_01") is None
 ///         True
 #[pyfunction]
 fn from_str(
-    n_str: String,
+    n: BigInt,
     p_bits_str: String,
     q_bits_str: String,
     verbose: Option<bool>,
-) -> PyResult<Option<(String, String)>> {
-    // ctrlc::set_handler(|| std::process::exit(2)).unwrap();
-    let n: Integer = n_str.parse().unwrap();
+    search: Option<String>,
+) -> PyResult<Option<(BigInt, BigInt)>> {
+    // ctrlc::set_handler(|| std::process::exit(2));
+    let n: Integer = n.to_str_radix(10).parse().unwrap();
     let bit_len = p_bits_str.len().max(q_bits_str.len());
     let p_bits = str_to_vec(p_bits_str.as_bytes(), bit_len);
     let q_bits = str_to_vec(q_bits_str.as_bytes(), bit_len);
-        Some((p, q)) => Ok(Some((p.to_string_radix(10), q.to_string_radix(10)))),
     match factor_core(
         &n,
         p_bits,
@@ -398,6 +403,10 @@ fn from_str(
         verbose.unwrap_or(false),
         search.unwrap_or("bfs".to_string()),
     ) {
+        Some((p, q)) => Ok(Some((
+            p.to_string_radix(10).parse().unwrap(),
+            q.to_string_radix(10).parse().unwrap(),
+        ))),
         None => Ok(None),
     }
 }

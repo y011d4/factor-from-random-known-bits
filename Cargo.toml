@@ -16,13 +16,16 @@ name = "factor"
 crate-type = ["cdylib"]
 
 [dependencies]
-# num-bigint = "0.4.0"
+num-bigint = "0.4.0"
 once_cell = "1.8.0"
 concurrent-queue = "1.2.2"
-# num = "0.4.0"
-rug = "1.12.0"
 ctrlc = "3.1.9"
 
 [dependencies.pyo3]
-version = "0.13.2"
-features = ["extension-module"]
+version = "0.14.1"
+features = ["extension-module", "num-bigint"]
+
+[dependencies.rug]
+version = "1.12.0"
+default-features = false
+features = ["integer"]
