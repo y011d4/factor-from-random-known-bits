@@ -7,8 +7,8 @@ use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 use rug::Integer;
 
-use factor::factor_core;
-use util::str_to_vec;
+use crate::factor::factor_core;
+use crate::util::str_to_vec;
 
 /// from_vector(n, p_bits, q_bits, verbose=False, search="bfs")
 /// --

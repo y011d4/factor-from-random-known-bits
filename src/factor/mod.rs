@@ -3,8 +3,8 @@ mod dfs;
 
 use rug::Integer;
 
-use bfs::factor_bfs;
-use dfs::factor_dfs;
+use crate::factor::bfs::factor_bfs;
+use crate::factor::dfs::factor_dfs;
 
 pub fn factor_core(
     n: &Integer,
